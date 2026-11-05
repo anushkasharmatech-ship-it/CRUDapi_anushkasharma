@@ -1,0 +1,742 @@
+{
+  "info": {
+    "name": "Student API CRUD Testing",
+    "description": "Automated CRUD tests derived from the actual StudentController, TeacherController and CourseController implementations.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "studentId",
+      "value": ""
+    },
+    {
+      "key": "teacherId",
+      "value": ""
+    },
+    {
+      "key": "courseId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Student",
+      "item": [
+        {
+          "name": "1. Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Student\",\n  \"email\": \"postman.student@example.com\",\n  \"age\": 21,\n  \"teacher\": { \"id\": 1 }\n}"
+            },
+            "url": "{{baseUrl}}/api/students"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is valid JSON', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test('Created student contains a valid ID', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "    pm.expect(json.id).to.be.above(0);",
+                  "    pm.collectionVariables.set('studentId', String(json.id));",
+                  "});",
+                  "pm.test('Created student has the submitted fields', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.name).to.eql('Postman Student');",
+                  "    pm.expect(json.email).to.eql('postman.student@example.com');",
+                  "    pm.expect(json.age).to.eql(21);",
+                  "    pm.expect(json.teacher).to.be.an('object');",
+                  "    pm.expect(json.teacher.id).to.eql(1);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Get All Students",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is a valid JSON array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    pm.expect(json.length).to.be.above(0);",
+                  "});",
+                  "pm.test('Created student is present in the list', function () {",
+                  "    const json = pm.response.json();",
+                  "    const studentId = Number(pm.collectionVariables.get('studentId'));",
+                  "    const found = json.find(function (s) { return s.id === studentId; });",
+                  "    pm.expect(found).to.exist;",
+                  "    pm.expect(found.name).to.eql('Postman Student');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Get Student By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/getById?id={{studentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is valid JSON', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test('Returned student matches the saved ID', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(String(json.id)).to.eql(pm.collectionVariables.get('studentId'));",
+                  "    pm.expect(json.name).to.eql('Postman Student');",
+                  "    pm.expect(json.email).to.eql('postman.student@example.com');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Student Updated\",\n  \"email\": \"postman.updated@example.com\",\n  \"age\": 22,\n  \"teacher\": { \"id\": 1 }\n}"
+            },
+            "url": "{{baseUrl}}/api/students/{{studentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is valid JSON', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test('Student fields were updated', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(String(json.id)).to.eql(pm.collectionVariables.get('studentId'));",
+                  "    pm.expect(json.name).to.eql('Postman Student Updated');",
+                  "    pm.expect(json.email).to.eql('postman.updated@example.com');",
+                  "    pm.expect(json.age).to.eql(22);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Search Students By Teacher Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/by-teacher?name=Mrs. Sharma"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is a valid JSON array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    pm.expect(json.length).to.be.above(0);",
+                  "});",
+                  "pm.test('Every student belongs to Mrs. Sharma', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function (s) {",
+                  "        pm.expect(s.teacher).to.be.an('object');",
+                  "        pm.expect(s.teacher.name).to.eql('Mrs. Sharma');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. Get Student Counts Per Teacher",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/teacher-counts"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is a valid JSON array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    pm.expect(json.length).to.be.above(0);",
+                  "});",
+                  "pm.test('Each row has a teacher name and a count', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function (row) {",
+                  "        pm.expect(row).to.be.an('array');",
+                  "        pm.expect(row[0]).to.be.a('string');",
+                  "        pm.expect(row[1]).to.be.a('number');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7. Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/{{studentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response confirms deletion', function () {",
+                  "    pm.expect(pm.response.text()).to.include('Student deleted with id: ' + pm.collectionVariables.get('studentId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "8. Verify Student Deletion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/getById?id={{studentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Deleted student cannot be retrieved successfully', function () {",
+                  "    pm.expect(pm.response.code).to.not.eql(200);",
+                  "});",
+                  "pm.test('Response is not the deleted student record', function () {",
+                  "    const text = pm.response.text();",
+                  "    pm.expect(text).to.not.include('Postman Student Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Teacher",
+      "item": [
+        {
+          "name": "1. Create Teacher",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Teacher\",\n  \"subject\": \"Physics\"\n}"
+            },
+            "url": "{{baseUrl}}/api/teachers"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is valid JSON', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test('Created teacher contains a valid ID', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "    pm.expect(json.id).to.be.above(0);",
+                  "    pm.collectionVariables.set('teacherId', String(json.id));",
+                  "});",
+                  "pm.test('Created teacher has the submitted fields', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.name).to.eql('Postman Teacher');",
+                  "    pm.expect(json.subject).to.eql('Physics');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Get All Teachers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/teachers"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is a valid JSON array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    pm.expect(json.length).to.be.above(0);",
+                  "});",
+                  "pm.test('Created teacher is present in the list', function () {",
+                  "    const json = pm.response.json();",
+                  "    const teacherId = Number(pm.collectionVariables.get('teacherId'));",
+                  "    const found = json.find(function (t) { return t.id === teacherId; });",
+                  "    pm.expect(found).to.exist;",
+                  "    pm.expect(found.name).to.eql('Postman Teacher');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Get Teacher By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/teachers/{{teacherId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is valid JSON', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test('Returned teacher matches the saved ID', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(String(json.id)).to.eql(pm.collectionVariables.get('teacherId'));",
+                  "    pm.expect(json.name).to.eql('Postman Teacher');",
+                  "    pm.expect(json.subject).to.eql('Physics');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Update Teacher",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Teacher Updated\",\n  \"subject\": \"Advanced Physics\"\n}"
+            },
+            "url": "{{baseUrl}}/api/teachers/{{teacherId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is valid JSON', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test('Teacher fields were updated', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(String(json.id)).to.eql(pm.collectionVariables.get('teacherId'));",
+                  "    pm.expect(json.name).to.eql('Postman Teacher Updated');",
+                  "    pm.expect(json.subject).to.eql('Advanced Physics');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Delete Teacher",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/teachers/{{teacherId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response confirms deletion', function () {",
+                  "    pm.expect(pm.response.text()).to.include('Teacher deleted with id: ' + pm.collectionVariables.get('teacherId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. Verify Teacher Deletion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/teachers/{{teacherId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Deleted teacher cannot be retrieved successfully', function () {",
+                  "    pm.expect(pm.response.code).to.not.eql(200);",
+                  "});",
+                  "pm.test('Response is not the deleted teacher record', function () {",
+                  "    const text = pm.response.text();",
+                  "    pm.expect(text).to.not.include('Postman Teacher Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Course",
+      "item": [
+        {
+          "name": "1. Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseName\": \"Postman Testing Course\",\n  \"duration\": \"6 weeks\",\n  \"fees\": 9999.5\n}"
+            },
+            "url": "{{baseUrl}}/api/courses"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Response body is valid JSON', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test('Created course contains a valid ID', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "    pm.expect(json.id).to.be.above(0);",
+                  "    pm.collectionVariables.set('courseId', String(json.id));",
+                  "});",
+                  "pm.test('Created course has the submitted fields', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.courseName).to.eql('Postman Testing Course');",
+                  "    pm.expect(json.duration).to.eql('6 weeks');",
+                  "    pm.expect(json.fees).to.eql(9999.5);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Get All Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is a valid JSON array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    pm.expect(json.length).to.be.above(0);",
+                  "});",
+                  "pm.test('Created course is present in the list', function () {",
+                  "    const json = pm.response.json();",
+                  "    const courseId = Number(pm.collectionVariables.get('courseId'));",
+                  "    const found = json.find(function (c) { return c.id === courseId; });",
+                  "    pm.expect(found).to.exist;",
+                  "    pm.expect(found.courseName).to.eql('Postman Testing Course');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Get Course By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is valid JSON', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test('Returned course matches the saved ID', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(String(json.id)).to.eql(pm.collectionVariables.get('courseId'));",
+                  "    pm.expect(json.courseName).to.eql('Postman Testing Course');",
+                  "    pm.expect(json.duration).to.eql('6 weeks');",
+                  "    pm.expect(json.fees).to.eql(9999.5);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseName\": \"Postman Advanced Course\",\n  \"duration\": \"8 weeks\",\n  \"fees\": 12000.0\n}"
+            },
+            "url": "{{baseUrl}}/api/courses/{{courseId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is valid JSON', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "pm.test('Course fields were updated', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(String(json.id)).to.eql(pm.collectionVariables.get('courseId'));",
+                  "    pm.expect(json.courseName).to.eql('Postman Advanced Course');",
+                  "    pm.expect(json.duration).to.eql('8 weeks');",
+                  "    pm.expect(json.fees).to.eql(12000.0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Search Courses By Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/search?name=Postman"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response body is a valid JSON array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    pm.expect(json.length).to.be.above(0);",
+                  "});",
+                  "pm.test('Search is case-insensitive partial match for Postman', function () {",
+                  "    const json = pm.response.json();",
+                  "    const courseId = Number(pm.collectionVariables.get('courseId'));",
+                  "    const found = json.find(function (c) { return c.id === courseId; });",
+                  "    pm.expect(found).to.exist;",
+                  "    pm.expect(found.courseName.toLowerCase()).to.include('postman');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response confirms deletion', function () {",
+                  "    pm.expect(pm.response.text()).to.include('Course deleted with id: ' + pm.collectionVariables.get('courseId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7. Verify Course Deletion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Deleted course cannot be retrieved', function () {",
+                  "    pm.expect(pm.response.text()).to.include('Course not found with id: ' + pm.collectionVariables.get('courseId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
